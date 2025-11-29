@@ -1,18 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-
-  /* ---------------- COVER SCREEN LOGIC ---------------- */
-
-  const cover = document.getElementById('cover');
-  const enterBtn = document.getElementById('enterBtn');
-  const mainContent = document.getElementById('mainContent');
-
-  enterBtn.addEventListener('click', () => {
-    cover.style.display = "none";
-    mainContent.classList.remove('blurred');
-  });
-
-  /* ---------------- REST OF YOUR ORIGINAL CODE ---------------- */
-
   const yesBtn = document.getElementById('yesBtn');
   const noBtn = document.getElementById('noBtn');
   const popup = document.getElementById('popup');
@@ -56,9 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   popup.addEventListener('click', function(e) {
-    if (e.target === popup) {
-      popup.classList.remove('active');
-    }
+    if (e.target === popup) popup.classList.remove('active');
   });
 
   function createConfetti() {
