@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+  /* ---------------- COVER SCREEN LOGIC ---------------- */
+
+  const cover = document.getElementById('cover');
+  const enterBtn = document.getElementById('enterBtn');
+  const mainContent = document.getElementById('mainContent');
+
+  enterBtn.addEventListener('click', () => {
+    cover.style.display = "none";
+    mainContent.classList.remove('blurred');
+  });
+
+  /* ---------------- REST OF YOUR ORIGINAL CODE ---------------- */
+
   const yesBtn = document.getElementById('yesBtn');
   const noBtn = document.getElementById('noBtn');
   const popup = document.getElementById('popup');
@@ -6,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const confettiContainer = document.getElementById('confettiContainer');
   const heartsContainer = document.getElementById('heartsContainer');
 
-  // Yes button click - celebration and popup
   yesBtn.addEventListener('click', function() {
     yesBtn.animate([
       { transform: 'scale(1)' },
@@ -27,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 4000);
   });
 
-  // No button click - dodge animation
   noBtn.addEventListener('click', function() {
     const offsetX = (Math.random() - 0.5) * 120;
     const offsetY = (Math.random() - 0.5) * 40;
