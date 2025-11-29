@@ -1,0 +1,230 @@
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Heart, Sparkles } from "lucide-react";
+import cuteBearsGif from "@assets/1B66388D-9A59-4429-8550-834B8F09E3CA_1764388229292.gif";
+
+interface InteractiveCardProps {
+  question?: string;
+}
+
+function Confetti() {
+  const colors = ["#60a5fa", "#3b82f6", "#93c5fd", "#bfdbfe", "#2563eb", "#f472b6", "#fb7185"];
+  const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 0.5,
+    duration: 2 + Math.random() * 2,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    size: 6 + Math.random() * 8,
+    rotation: Math.random() * 360,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+      {confettiPieces.map((piece) => (
+        <div
+          key={piece.id}
+          className="absolute animate-confetti-fall"
+          style={{
+            left: `${piece.left}%`,
+            top: "-20px",
+            width: `${piece.size}px`,
+            height: `${piece.size}px`,
+            backgroundColor: piece.color,
+            borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+            transform: `rotate(${piece.rotation}deg)`,
+            animation: `confetti-fall ${piece.duration}s ease-out ${piece.delay}s forwards`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(0) rotate(0deg) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg) scale(0.5);
+            opacity: 0;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function FloatingHearts() {
+  const hearts = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    left: 10 + Math.random() * 80,
+    delay: Math.random() * 1,
+    duration: 2 + Math.random() * 1.5,
+    size: 16 + Math.random() * 20,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+      {hearts.map((heart) => (
+        <div
+          key={heart.id}
+          className="absolute text-primary"
+          style={{
+            left: `${heart.left}%`,
+            bottom: "-40px",
+            fontSize: `${heart.size}px`,
+            animation: `float-up ${heart.duration}s ease-out ${heart.delay}s forwards`,
+          }}
+        >
+          <Heart className="fill-current" style={{ width: heart.size, height: heart.size }} />
+        </div>
+      ))}
+      <style>{`
+        @keyframes float-up {
+          0% {
+            transform: translateY(0) scale(0.5);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+            transform: translateY(-20vh) scale(1);
+          }
+          100% {
+            transform: translateY(-100vh) scale(0.8);
+            opacity: 0;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default function InteractiveCard({
+  question = "Will you be my boyfriend?",
+}: InteractiveCardProps) {
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const yesButtonRef = useRef<HTMLButtonElement>(null);
+  const noButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleYesClick = useCallback(() => {
+    setShowCelebration(true);
+    
+    if (yesButtonRef.current) {
+      yesButtonRef.current.animate(
+        [
+          { transform: "scale(1)" },
+          { transform: "scale(1.15)" },
+          { transform: "scale(1)" },
+        ],
+        { duration: 400, easing: "ease-out" }
+      );
+    }
+    
+    setTimeout(() => {
+      setShowDialog(true);
+    }, 800);
+  }, []);
+
+  const handleNoClick = useCallback(() => {
+    if (noButtonRef.current) {
+      const offsetX = (Math.random() - 0.5) * 120;
+      const offsetY = (Math.random() - 0.5) * 40;
+      
+      noButtonRef.current.animate(
+        [
+          { transform: "translate(0px, 0px)" },
+          { transform: `translate(${offsetX}px, ${offsetY}px)` },
+          { transform: "translate(0px, 0px)" },
+        ],
+        { duration: 450, easing: "ease-out" }
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showCelebration) return;
+    
+    const timer = setTimeout(() => {
+      setShowCelebration(false);
+    }, 4000);
+    
+    return () => clearTimeout(timer);
+  }, [showCelebration]);
+
+  return (
+    <>
+      {showCelebration && (
+        <>
+          <Confetti />
+          <FloatingHearts />
+        </>
+      )}
+      
+      <Card 
+        className="w-full max-w-[720px] p-5 sm:p-9 text-center border border-primary/10 shadow-[0_12px_30px_rgba(59,130,246,0.12)]"
+        data-testid="card-interactive"
+      >
+        <h1 
+          className="text-[22px] sm:text-[28px] font-bold tracking-[0.2px] leading-tight mb-5 text-primary"
+          data-testid="text-question"
+        >
+          {question} <Heart className="inline-block w-6 h-6 sm:w-7 sm:h-7 text-primary fill-primary" />
+        </h1>
+
+        <div className="flex gap-3 sm:gap-4 justify-center flex-wrap mt-2">
+          <Button
+            ref={yesButtonRef}
+            onClick={handleYesClick}
+            variant="outline"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 text-[15px] sm:text-base border-2 border-primary text-primary bg-white dark:bg-card hover:bg-primary/5 shadow-[0_6px_18px_rgba(59,130,246,0.08)] transition-transform duration-200 ease-out hover:-translate-y-1 active:scale-[0.98]"
+            aria-label="Yes button"
+            data-testid="button-yes"
+          >
+            Yes
+          </Button>
+          
+          <Button
+            ref={noButtonRef}
+            onClick={handleNoClick}
+            variant="outline"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 text-[15px] sm:text-base border-2 border-primary text-primary bg-white dark:bg-card hover:bg-primary/5 shadow-[0_6px_18px_rgba(59,130,246,0.08)] transition-transform duration-200 ease-out hover:-translate-y-1 active:scale-[0.98]"
+            aria-label="No button"
+            data-testid="button-no"
+          >
+            No
+          </Button>
+        </div>
+      </Card>
+
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="sm:max-w-md border-primary/20 shadow-[0_20px_50px_rgba(59,130,246,0.2)]">
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+              <h2 
+                className="text-3xl sm:text-4xl font-bold text-primary"
+                data-testid="text-love-message"
+              >
+                i love you!
+              </h2>
+              <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+            </div>
+            <img 
+              src={cuteBearsGif} 
+              alt="Cute bears hugging" 
+              className="w-48 h-48 object-contain my-4"
+              data-testid="img-cute-bears"
+            />
+            <p className="text-muted-foreground">
+              <Heart className="inline w-4 h-4 text-primary fill-primary mx-1" />
+              <Heart className="inline w-4 h-4 text-primary fill-primary mx-1" />
+              <Heart className="inline w-4 h-4 text-primary fill-primary mx-1" />
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
